@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinIO File Operations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="file"], button {
+            margin: 5px;
+        }
+        .output {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>MinIO File Operations</h1>
+
+    <!-- File Upload Form -->
+    <h2>Upload File</h2>
+    <form id="uploadForm">
+        <label for="bucketName">Bucket Name:</label>
+        <input type="text" id="uploadBucketName" placeholder="Enter bucket name" required>
+        <label for="file">Select File:</label>
+        <input type="file" id="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="uploadResult" class="output"></div>
+
+    <!-- List Objects -->
+    <h2>View Files</h2>
+    <form id="viewForm">
+        <label for="viewBucketName">Bucket Name:</label>
+        <input type="text" id="viewBucketName" placeholder="Enter bucket name" required>
+        <button type="submit">View Files</button>
+    </form>
+    <ul id="fileList"></ul>
+
+    <!-- Download/Delete Forms -->
+    <h2>Download/Delete File</h2>
+    <form id="fileOpsForm">
+        <label for="fileOpsBucketName">Bucket Name:</label>
+        <input type="text" id="fileOpsBucketName" placeholder="Enter bucket name" required>
+        <label for="fileName">File Name:</label>
+        <input type="text" id="fileName" placeholder="Enter file name" required>
+        <button id="downloadBtn" type="button">Download</button>
+        <button id="deleteBtn" type="button">Delete</button>
+    </form>
+    <div id="fileOpsResult" class="output"></div>
+
+    <script>
+        const apiBaseUrl = "http://127.0.0.1:9000"; // Replace with your API URL
+
+        // Handle file upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bucketName = document.getElementById('uploadBucketName').value;
+            const fileInput = document.getElementById('file').files[0];
+            const formData = new FormData();
+            formData.append('file', fileInput);
+
+            const response = await fetch(`${apiBaseUrl}/upload-object/${bucketName}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('uploadResult').textContent = JSON.stringify(result);
+        });
+
+        // Handle view files
+        document.getElementById('viewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bucketName = document.getElementById('viewBucketName').value;
+
+            const response = await fetch(`${apiBaseUrl}/list-objects/${bucketName}`);
+            const result = await response.json();
+
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            if (result.objects) {
+                result.objects.forEach(file => {
+                    const li = document.createElement('li');
+                    li.textContent = file;
+                    fileList.appendChild(li);
+                });
+            } else {
+                fileList.textContent = "No files found.";
+            }
+        });
+
+        // Handle download file
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            const bucketName = document.getElementById('fileOpsBucketName').value;
+            const fileName = document.getElementById('fileName').value;
+
+            const response = await fetch(`${apiBaseUrl}/download-object/${bucketName}/${fileName}`);
+            if (response.ok) {
+                const blob = await response.blob();
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+                document.getElementById('fileOpsResult').textContent = `File '${fileName}' downloaded successfully.`;
+            } else {
+                const result = await response.json();
+                document.getElementById('fileOpsResult').textContent = JSON.stringify(result);
+            }
+        });
+
+        // Handle delete file
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            const bucketName = document.getElementById('fileOpsBucketName').value;
+            const fileName = document.getElementById('fileName').value;
+
+            const response = await fetch(`${apiBaseUrl}/delete-object/${bucketName}/${fileName}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            document.getElementById('fileOpsResult').textContent = JSON.stringify(result);
+        });
+    </script>
+</body>
+</html>
