@@ -1,24 +1,31 @@
-annotated-types      
-anyio                
-argon2-cffi          
-argon2-cffi-bindings 
-certifi              
-cffi                 
-click                
-colorama             
-fastapi             
-h11                  
-idna                 
-minio                
-pip                  
-pycparser            
-pycryptodome         
-pydantic            
-pydantic_core        
-python-multipart     
-setuptools           
-sniffio              
-starlette            
-typing_extensions    
-urllib3              
-uvicorn        
+# annotated-types      
+# anyio                
+# argon2-cffi          
+# argon2-cffi-bindings 
+# certifi              
+# cffi                 
+# click                
+# colorama             
+# fastapi             
+# h11                  
+# idna                 
+# minio                
+# pip                  
+# pycparser            
+# pycryptodome         
+# pydantic            
+# pydantic_core        
+# python-multipart     
+# setuptools           
+# sniffio              
+# starlette            
+# typing_extensions    
+# urllib3              
+# uvicorn        
+
+fastapi
+uvicorn
+minio
+starlette
+python-multipart
+fastapi
